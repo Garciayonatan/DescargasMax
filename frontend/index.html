@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MultiTools PRO | Real Processing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: rgba(30, 41, 59, 0.7);
+            --primary: #818cf8;
+            --primary-hover: #6366f1;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border-color: rgba(148, 163, 184, 0.15);
+            --glass: blur(12px) saturate(180%);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            position: fixed; top: 0; width: 100%;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: var(--glass);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000; padding: 1rem 5%;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .logo { color: var(--primary); text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+
+        /* Main Container */
+        .main-container {
+            flex: 1; max-width: 1100px;
+            margin: 120px auto 60px; padding: 0 20px;
+            display: flex; flex-direction: column; gap: 40px;
+        }
+
+        .hero { text-align: center; }
+        .hero h1 { font-size: 2.5rem; margin-bottom: 10px; font-family: 'Poppins'; background: linear-gradient(to right, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        /* Cards */
+        .tools-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; }
+        .card {
+            background: var(--bg-card); border-radius: 20px; padding: 30px;
+            border: 1px solid var(--border-color); backdrop-filter: var(--glass);
+            display: flex; flex-direction: column; gap: 20px;
+        }
+
+        .input-wrapper { position: relative; }
+        .input-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-muted); width: 18px; }
+        
+        input, select {
+            width: 100%; padding: 12px 12px 12px 45px;
+            background: rgba(0,0,0,0.3); border: 1px solid var(--border-color);
+            border-radius: 10px; color: white; outline: none;
+        }
+
+        button {
+            padding: 14px; border-radius: 10px; border: none; font-weight: 600;
+            cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .btn-primary { background: var(--primary); color: #0f172a; }
+        .btn-primary:hover { background: var(--primary-hover); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* Upload Zone */
+        .upload-zone {
+            border: 2px dashed var(--border-color); border-radius: 15px;
+            padding: 40px; text-align: center; cursor: pointer; color: var(--text-muted);
+        }
+        .upload-zone.active { border-color: var(--primary); background: rgba(129, 140, 248, 0.1); }
+
+        /* Toast Display */
+        #statusDisplay {
+            position: fixed; bottom: 20px; right: 20px;
+            padding: 15px 25px; border-radius: 10px; display: none;
+            z-index: 2000; animation: slideUp 0.4s ease;
+        }
+        .success { background: #10b981; color: white; }
+        .error { background: #ef4444; color: white; }
+        .info { background: #3b82f6; color: white; }
+
+        @keyframes slideUp { from { transform: translateY(100px); } to { transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<header class="header">
+    <a href="#" class="logo"><i data-lucide="layers"></i> MultiTools <span>PRO</span></a>
+</header>
+
+<main class="main-container">
+    <section class="hero">
+        <h1>Procesamiento Premium</h1>
+        <p>Herramientas reales conectadas a servidores de alta velocidad.</p>
+    </section>
+
+    <div class="tools-grid">
+        <section class="card">
+            <div class="card-header">
+                <h2>Descargador Real</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">YouTube, TikTok, FB e IG</p>
+            </div>
+            <div class="input-wrapper">
+                <i data-lucide="link" class="input-icon"></i>
+                <input type="text" id="mediaUrl" placeholder="Pega el enlace aquí...">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <button onclick="processMedia('mp3')" class="btn-primary" id="btnMp3">MP3</button>
+                <button onclick="processMedia('mp4')" class="btn-primary" id="btnMp4">MP4</button>
+            </div>
+        </section>
+
+        <section class="card">
+            <div class="card-header">
+                <h2>Conversor Real</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">PDF y Documentos</p>
+            </div>
+            <div class="upload-zone" id="dropZone">
+                <i data-lucide="upload-cloud"></i>
+                <p id="fileText">Arrastra o selecciona un archivo</p>
+                <input type="file" id="fileInput" hidden>
+            </div>
+            <select id="convertFormat">
+                <option value="" disabled selected>Convertir a...</option>
+                <option value="pdf">PDF</option>
+                <option value="docx">Word (DOCX)</option>
+            </select>
+            <button onclick="processDocument()" class="btn-primary" id="btnConvert">Convertir Ahora</button>
+        </section>
+    </div>
+</main>
+
+<div id="statusDisplay"></div>
+
+<script>
+    lucide.createIcons();
+    const status = document.getElementById('statusDisplay');
+    let selectedFile = null;
+
+    function showStatus(msg, type) {
+        status.innerText = msg;
+        status.className = type;
+        status.style.display = 'block';
+        setTimeout(() => status.style.display = 'none', 5000);
+    }
+
+    // --- LÓGICA DE MULTIMEDIA REAL ---
+    async function processMedia(format) {
+        const url = document.getElementById('mediaUrl').value;
+        if (!url) return showStatus("Ingresa una URL", "error");
+
+        const btn = format === 'mp3' ? document.getElementById('btnMp3') : document.getElementById('btnMp4');
+        btn.disabled = true;
+        showStatus(`Procesando ${format.toUpperCase()}... Por favor espera.`, "info");
+
+        try {
+            // El backend debe devolver el archivo directamente como un Stream
+            window.location.href = `/api/download?url=${encodeURIComponent(url)}&format=${format}`;
+            showStatus("Descarga iniciada", "success");
+        } catch (err) {
+            showStatus("Error al procesar el video", "error");
+        } finally {
+            setTimeout(() => btn.disabled = false, 5000);
+        }
+    }
+
+    // --- LÓGICA DE DOCUMENTOS REAL ---
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+
+    dropZone.onclick = () => fileInput.click();
+    fileInput.onchange = (e) => {
+        selectedFile = e.target.files[0];
+        document.getElementById('fileText').innerText = `Archivo: ${selectedFile.name}`;
+        dropZone.classList.add('active');
+    };
+
+    async function processDocument() {
+        const format = document.getElementById('convertFormat').value;
+        if (!selectedFile || !format) return showStatus("Selecciona archivo y formato", "error");
+
+        const btn = document.getElementById('btnConvert');
+        btn.disabled = true;
+        showStatus("Subiendo y convirtiendo...", "info");
+
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+        formData.append('targetFormat', format);
+
+        try {
+            const response = await fetch('/api/convert', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!response.ok) throw new Error();
+
+            const blob = await response.blob();
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = downloadUrl;
+            a.download = `MultiTools_converted.${format}`;
+            document.body.appendChild(a);
+            a.click();
+            showStatus("¡Conversión exitosa!", "success");
+        } catch (err) {
+            showStatus("Error en el servidor", "error");
+        } finally {
+            btn.disabled = false;
+        }
+    }
+</script>
+</body>
+</html>
